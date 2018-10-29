@@ -10,6 +10,11 @@ typedef struct {
     unsigned char type, max;
 } image;
 
+typedef struct {
+    image * in, * out;
+    int start, stop;
+} options;
+
 void readInput(const char * fileName, image *img);
 
 void writeData(const char * fileName, image *img);
