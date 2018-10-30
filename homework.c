@@ -96,11 +96,11 @@ void * threadFunction (void * var) {
     image * in = opt.in;
     image * out = opt.out;
 
-    int i, j, a, b, c;
+    int i, j, a, b;
 
     int rf_2 = resize_factor * resize_factor;
     int sumR, sumG, sumB;
-    int jrf, irf;
+    int jrf, irf, jrf1, jrf2, jrfa, irf1, irf2, irfb;
 
     for (j = opt.start; j < opt.stop; j++) {
         if (out -> type == IMAGE_GRAYSCALE) {
@@ -110,96 +110,208 @@ void * threadFunction (void * var) {
             ((unsigned char***)(out -> pixels))[j] = (unsigned char **)malloc(out -> width * sizeof(unsigned char *));
         }
 
-        for (i = 0; i < out -> width; i++) {
-            sumR = sumG = sumB = 0;
-            jrf = j * resize_factor;
-            irf = i * resize_factor;
+        jrf = j * resize_factor;
+        jrf1 = jrf + 1;
+        jrf2 = jrf + 2;
 
-            // I'm going to hell for this
-            // Eram prea obosit
-            if (out -> type == IMAGE_GRAYSCALE) {
-                if (resize_factor != 3) {
-                    for (a = 0; a < resize_factor; a++) {
-                        for (b = 0; b < resize_factor; b++) {
-                            sumR += ((unsigned char**)(in -> pixels))[jrf + a][irf + b];
-                        }
+        if (out -> type == IMAGE_GRAYSCALE && resize_factor != 3) {
+            for (i = 0; i < out -> width; i++) {
+                sumR = 0;
+                irf = i * resize_factor;
+
+                for (a = 0; a < resize_factor; a++) {
+                    jrfa = jrf + a;
+
+                    for (b = 0; b < resize_factor; b++) {
+                        irfb = irf + b;
+
+                        sumR += ((unsigned char**)(in -> pixels))[jrfa][irfb];
                     }
-
-                    ((unsigned char**)(out -> pixels))[j][i] = sumR / rf_2;
-                }
-                else {
-                    ((unsigned char**)(out -> pixels))[j][i] = (
-                        ((unsigned char**)(in -> pixels))[jrf + 0][irf + 0]
-                        + 2 * ((unsigned char**)(in -> pixels))[jrf + 0][irf + 1]
-                        + ((unsigned char**)(in -> pixels))[jrf + 0][irf + 2]
-                        + 2 * ((unsigned char**)(in -> pixels))[jrf + 1][irf + 0]
-                        + 4 * ((unsigned char**)(in -> pixels))[jrf + 1][irf + 1]
-                        + 2 * ((unsigned char**)(in -> pixels))[jrf + 1][irf + 2]
-                        + ((unsigned char**)(in -> pixels))[jrf + 2][irf + 0]
-                        + 2 * ((unsigned char**)(in -> pixels))[jrf + 2][irf + 1]
-                        + ((unsigned char**)(in -> pixels))[jrf + 2][irf + 2]
-                    ) / 16;
-                }
-            }
-            else {
-                ((unsigned char***)(out -> pixels))[j][i] = (unsigned char *)malloc(3 * sizeof(unsigned char));
-                
-                if (resize_factor != 3) {
-                    for (a = 0; a < resize_factor; a++) {
-                        for (b = 0; b < resize_factor; b++) {
-                            sumR += ((unsigned char***)(in -> pixels))[jrf + a][irf + b][0];
-                            sumG += ((unsigned char***)(in -> pixels))[jrf + a][irf + b][1];
-                            sumB += ((unsigned char***)(in -> pixels))[jrf + a][irf + b][2];
-                        }
-                    }
-
-                    ((unsigned char***)(out -> pixels))[j][i][0] = sumR / rf_2;
-                    ((unsigned char***)(out -> pixels))[j][i][1] = sumG / rf_2;
-                    ((unsigned char***)(out -> pixels))[j][i][2] = sumB / rf_2;
-                }
-                else {
-                    c = 0;
-                    ((unsigned char***)(out -> pixels))[j][i][c] = (
-                        ((unsigned char***)(in -> pixels))[jrf + 0][irf + 0][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 0][irf + 1][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 0][irf + 2][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 0][c]
-                        + 4 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 1][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 2][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 0][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 2][irf + 1][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 2][c]
-                    ) / 16;
-                    c = 1;
-                    ((unsigned char***)(out -> pixels))[j][i][c] = (
-                        ((unsigned char***)(in -> pixels))[jrf + 0][irf + 0][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 0][irf + 1][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 0][irf + 2][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 0][c]
-                        + 4 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 1][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 2][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 0][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 2][irf + 1][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 2][c]
-                    ) / 16;
-                    c = 2;
-                    ((unsigned char***)(out -> pixels))[j][i][c] = (
-                        ((unsigned char***)(in -> pixels))[jrf + 0][irf + 0][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 0][irf + 1][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 0][irf + 2][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 0][c]
-                        + 4 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 1][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 2][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 0][c]
-                        + 2 * ((unsigned char***)(in -> pixels))[jrf + 2][irf + 1][c]
-                        + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 2][c]
-                    ) / 16;
                 }
 
-
+                ((unsigned char**)(out -> pixels))[j][i] = sumR / rf_2;
             }
         }
+        else if (out -> type == IMAGE_GRAYSCALE && resize_factor == 3) {
+            for (i = 0; i < out -> width; i++) {
+                irf = i * resize_factor;
+                irf1 = irf + 1;
+                irf2 = irf + 2;
+
+                ((unsigned char**)(out -> pixels))[j][i] = (
+                    ((unsigned char**)(in -> pixels))[jrf][irf]
+                    + 2 * ((unsigned char**)(in -> pixels))[jrf][irf1]
+                    + ((unsigned char**)(in -> pixels))[jrf][irf2]
+                    + 2 * ((unsigned char**)(in -> pixels))[jrf1][irf]
+                    + 4 * ((unsigned char**)(in -> pixels))[jrf1][irf1]
+                    + 2 * ((unsigned char**)(in -> pixels))[jrf1][irf2]
+                    + ((unsigned char**)(in -> pixels))[jrf2][irf]
+                    + 2 * ((unsigned char**)(in -> pixels))[jrf2][irf1]
+                    + ((unsigned char**)(in -> pixels))[jrf2][irf2]
+                ) / 16;
+            }
+        }
+        else if (out -> type == IMAGE_COLOR && resize_factor != 3) {
+            for (i = 0; i < out -> width; i++) {
+                ((unsigned char***)(out -> pixels))[j][i] = (unsigned char *)malloc(3 * sizeof(unsigned char));
+                
+                irf = i * resize_factor;
+                sumR = sumG = sumB = 0;
+
+                for (a = 0; a < resize_factor; a++) {
+                    jrfa = jrf + a;
+
+                    for (b = 0; b < resize_factor; b++) {
+                        irfb = irf + b;
+
+                        sumR += ((unsigned char***)(in -> pixels))[jrfa][irfb][0];
+                        sumG += ((unsigned char***)(in -> pixels))[jrfa][irfb][1];
+                        sumB += ((unsigned char***)(in -> pixels))[jrfa][irfb][2];
+                    }
+                }
+
+                ((unsigned char***)(out -> pixels))[j][i][0] = sumR / rf_2;
+                ((unsigned char***)(out -> pixels))[j][i][1] = sumG / rf_2;
+                ((unsigned char***)(out -> pixels))[j][i][2] = sumB / rf_2;
+            }
+        }
+        else if (out -> type == IMAGE_COLOR && resize_factor == 3) {
+            for (i = 0; i < out -> width; i++) {
+                ((unsigned char***)(out -> pixels))[j][i] = (unsigned char *)malloc(3 * sizeof(unsigned char));
+
+                irf = i * resize_factor;
+                irf1 = irf + 1;
+                irf2 = irf + 2;
+
+                ((unsigned char***)(out -> pixels))[j][i][0] = (
+                    ((unsigned char***)(in -> pixels))[jrf][irf][0]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf][irf1][0]
+                    + ((unsigned char***)(in -> pixels))[jrf][irf2][0]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf1][irf][0]
+                    + 4 * ((unsigned char***)(in -> pixels))[jrf1][irf1][0]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf1][irf2][0]
+                    + ((unsigned char***)(in -> pixels))[jrf2][irf][0]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf2][irf1][0]
+                    + ((unsigned char***)(in -> pixels))[jrf2][irf2][0]
+                ) / 16;
+                ((unsigned char***)(out -> pixels))[j][i][1] = (
+                    ((unsigned char***)(in -> pixels))[jrf][irf][1]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf][irf1][1]
+                    + ((unsigned char***)(in -> pixels))[jrf][irf2][1]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf1][irf][1]
+                    + 4 * ((unsigned char***)(in -> pixels))[jrf1][irf1][1]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf1][irf2][1]
+                    + ((unsigned char***)(in -> pixels))[jrf2][irf][1]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf2][irf1][1]
+                    + ((unsigned char***)(in -> pixels))[jrf2][irf2][1]
+                ) / 16;
+                ((unsigned char***)(out -> pixels))[j][i][2] = (
+                    ((unsigned char***)(in -> pixels))[jrf][irf][2]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf][irf1][2]
+                    + ((unsigned char***)(in -> pixels))[jrf][irf2][2]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf1][irf][2]
+                    + 4 * ((unsigned char***)(in -> pixels))[jrf1][irf1][2]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf1][irf2][2]
+                    + ((unsigned char***)(in -> pixels))[jrf2][irf][2]
+                    + 2 * ((unsigned char***)(in -> pixels))[jrf2][irf1][2]
+                    + ((unsigned char***)(in -> pixels))[jrf2][irf2][2]
+                ) / 16;
+            }
+        }
+        else {
+            return NULL;
+        }
+
+        // for (i = 0; i < out -> width; i++) {
+        //     sumR = sumG = sumB = 0;
+        //     jrf = j * resize_factor;
+        //     irf = i * resize_factor;
+
+        //     // I'm going to hell for this
+        //     // Eram prea obosit
+        //     if (out -> type == IMAGE_GRAYSCALE) {
+        //         if (resize_factor != 3) {
+        //             for (a = 0; a < resize_factor; a++) {
+        //                 for (b = 0; b < resize_factor; b++) {
+        //                     sumR += ((unsigned char**)(in -> pixels))[jrf + a][irf + b];
+        //                 }
+        //             }
+
+        //             ((unsigned char**)(out -> pixels))[j][i] = sumR / rf_2;
+        //         }
+        //         else {
+        //             ((unsigned char**)(out -> pixels))[j][i] = (
+        //                 ((unsigned char**)(in -> pixels))[jrf + 0][irf + 0]
+        //                 + 2 * ((unsigned char**)(in -> pixels))[jrf + 0][irf + 1]
+        //                 + ((unsigned char**)(in -> pixels))[jrf + 0][irf + 2]
+        //                 + 2 * ((unsigned char**)(in -> pixels))[jrf + 1][irf + 0]
+        //                 + 4 * ((unsigned char**)(in -> pixels))[jrf + 1][irf + 1]
+        //                 + 2 * ((unsigned char**)(in -> pixels))[jrf + 1][irf + 2]
+        //                 + ((unsigned char**)(in -> pixels))[jrf + 2][irf + 0]
+        //                 + 2 * ((unsigned char**)(in -> pixels))[jrf + 2][irf + 1]
+        //                 + ((unsigned char**)(in -> pixels))[jrf + 2][irf + 2]
+        //             ) / 16;
+        //         }
+        //     }
+        //     else {
+        //         ((unsigned char***)(out -> pixels))[j][i] = (unsigned char *)malloc(3 * sizeof(unsigned char));
+                
+        //         if (resize_factor != 3) {
+        //             for (a = 0; a < resize_factor; a++) {
+        //                 for (b = 0; b < resize_factor; b++) {
+        //                     sumR += ((unsigned char***)(in -> pixels))[jrf + a][irf + b][0];
+        //                     sumG += ((unsigned char***)(in -> pixels))[jrf + a][irf + b][1];
+        //                     sumB += ((unsigned char***)(in -> pixels))[jrf + a][irf + b][2];
+        //                 }
+        //             }
+
+        //             ((unsigned char***)(out -> pixels))[j][i][0] = sumR / rf_2;
+        //             ((unsigned char***)(out -> pixels))[j][i][1] = sumG / rf_2;
+        //             ((unsigned char***)(out -> pixels))[j][i][2] = sumB / rf_2;
+        //         }
+        //         else {
+        //             c = 0;
+        //             ((unsigned char***)(out -> pixels))[j][i][c] = (
+        //                 ((unsigned char***)(in -> pixels))[jrf + 0][irf + 0][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 0][irf + 1][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 0][irf + 2][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 0][c]
+        //                 + 4 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 1][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 2][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 0][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 2][irf + 1][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 2][c]
+        //             ) / 16;
+        //             c = 1;
+        //             ((unsigned char***)(out -> pixels))[j][i][c] = (
+        //                 ((unsigned char***)(in -> pixels))[jrf + 0][irf + 0][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 0][irf + 1][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 0][irf + 2][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 0][c]
+        //                 + 4 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 1][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 2][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 0][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 2][irf + 1][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 2][c]
+        //             ) / 16;
+        //             c = 2;
+        //             ((unsigned char***)(out -> pixels))[j][i][c] = (
+        //                 ((unsigned char***)(in -> pixels))[jrf + 0][irf + 0][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 0][irf + 1][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 0][irf + 2][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 0][c]
+        //                 + 4 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 1][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 1][irf + 2][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 0][c]
+        //                 + 2 * ((unsigned char***)(in -> pixels))[jrf + 2][irf + 1][c]
+        //                 + ((unsigned char***)(in -> pixels))[jrf + 2][irf + 2][c]
+        //             ) / 16;
+        //         }
+        //     }
+        // }
     }
+
+    return NULL;
 }
 
 void resize(image *in, image * out) { 
