@@ -55,35 +55,6 @@ void readInput(const char * fileName, image *img) {
             }
         }
     }
-    
-    // for (j = 0; j < img -> height; j++) {
-    //     if (img -> type == IMAGE_GRAYSCALE) {
-    //         (((unsigned char**)(img -> pixels))[j]) = (unsigned char *)malloc(img -> width);
-    //     }
-    //     else {
-    //         ((unsigned char***)(img -> pixels))[j] = (unsigned char **)malloc(img -> width * sizeof(unsigned char *));
-    //     }
-
-    //     for (i = 0; i < img -> width; i++) {
-    //         if (img -> type == IMAGE_GRAYSCALE) {
-    //             fread(&(((unsigned char**)(img -> pixels))[j][i]), 1, 1, file);
-
-    //             // fscanf(file, "%c", &(((unsigned char**)(img -> pixels))[j][i]));
-    //         }
-    //         else {
-    //             ((unsigned char***)(img -> pixels))[j][i] = (unsigned char *)malloc(3 * sizeof(unsigned char));
-    //             fread(((unsigned char***)(img -> pixels))[j][i], 1, 3, file);
-
-    //             // fscanf(
-    //             //     file,
-    //             //     "%c%c%c",
-    //             //     &((unsigned char***)(img -> pixels))[j][i][0],
-    //             //     &((unsigned char***)(img -> pixels))[j][i][1],
-    //             //     &((unsigned char***)(img -> pixels))[j][i][2]
-    //             // );
-    //         }
-    //     }
-    // }
 
     fclose(file);
 }
@@ -106,29 +77,11 @@ void writeData(const char * fileName, image *img) {
     if (img -> type == IMAGE_GRAYSCALE) {
         for (j = 0; j < img -> height; j++) {
             fwrite(((unsigned char **)(img -> pixels))[j], 1, img -> width, file);
-
-            // for (i = 0; i < img -> width; i++) {
-            //     // fprintf(
-            //     //     file,
-            //     //     "%c",
-            //     //     ((unsigned char **)(img -> pixels))[j][i]
-            //     // );
-
-            //     fwrite(&((unsigned char **)(img -> pixels))[j][i], 1, 1, file);
-            // }
         }
     }
     else {
         for (j = 0; j < img -> height; j++) {
             for (i = 0; i < img -> width; i++) {
-                // fprintf(
-                //     file,
-                //     "%c%c%c",
-                //     ((unsigned char ***)(img -> pixels))[j][i][0],
-                //     ((unsigned char ***)(img -> pixels))[j][i][1],
-                //     ((unsigned char ***)(img -> pixels))[j][i][2]
-                // );
-
                 fwrite(((unsigned char ***)(img -> pixels))[j][i], 1, 3, file);
             }
         }
