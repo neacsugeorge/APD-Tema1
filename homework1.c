@@ -29,13 +29,13 @@ void * threadFunction (void * var) {
         for (i = 0; i < img -> width; i++) {
             int y = img -> width - i - 1, x = j;
             
-            // CEA MAI DE CACAT CHESTIE EVER, sa ajungi sa faci bruteforce pe aceeasi formula
-            // pana cand aproximarea se nimereste cu ce aveti in checker...
             if (abs((-1.0 * (j + 0.5) + 2.0 * (i + 0.5)) / (img -> width / 100)) / sqrt(5) < 3) {
                 ((unsigned char **)(img -> pixels))[y][x] = 255;
             }
         }
     }
+
+    return NULL;
 }
 
 void render(image *im) {

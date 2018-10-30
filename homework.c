@@ -81,7 +81,7 @@ void * threadFunction (void * var) {
 
     int rf_2 = resize_factor * resize_factor;
     int sumR, sumG, sumB;
-    int jrf, irf, jrf1, jrf2, jrfa, irf0, irf1, irf2, irfb, irfb1, irfb2;
+    int jrf, irf, jrf1, jrf2, jrfa, irf1, irf2, irfb, irfb1, irfb2;
 
     for (j = opt.start; j < opt.stop; j++) {
         if (out -> type == IMAGE_GRAYSCALE) {
